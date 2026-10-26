@@ -1,0 +1,53 @@
+suite: maersk-conversation-style
+version: 1.0.0
+cases:
+  - id: active_voice
+    input: "Rewrite: The report will be published by us on 10 April."
+    expected_contains:
+      - "We’ll publish the report on 10 April."
+    checks: [active_voice, contraction, uk_date]
+
+  - id: plain_language
+    input: "Rewrite: Therefore, users are required to resubmit the form."
+    expected_contains:
+      - "Please submit the form again"
+    expected_not_contains: ["Therefore", "are required to"]
+
+  - id: acronym_external
+    context: "External audience; LFD means Legal Front Door."
+    input: "The LFD team will review your request."
+    checks: [acronym_expanded_on_first_use]
+
+  - id: preserve_identifier
+    input: "Explain error AUTH_TOKEN_EXPIRED without changing the identifier."
+    expected_contains: ["AUTH_TOKEN_EXPIRED"]
+    checks: [technical_identifier_preserved]
+
+  - id: no_invented_timeline
+    input: "Tell the customer we are investigating. No completion time is known."
+    expected_not_contains: ["24 hours", "tomorrow", "soon"]
+    checks: [no_unsupported_commitment]
+
+  - id: british_english
+    input: "Rewrite for external communication: Our organization optimizes transportation from the distribution center."
+    expected_contains: ["organisation", "optimises", "transport", "distribution centre"]
+    checks: [british_english]
+
+  - id: sentence_case
+    input: "Create a heading for customer support options."
+    checks: [sentence_case_heading]
+
+  - id: no_em_dash
+    input: "Rewrite: We can help—contact us today."
+    expected_not_contains: ["—"]
+    checks: [no_em_dash]
+
+  - id: legal_preservation
+    context: "The supplied clause is approved legal wording."
+    input: "Make the surrounding explanation friendlier but do not modify the clause."
+    checks: [quoted_legal_text_unchanged, explanation_plain_language]
+
+  - id: concise_conversation
+    input: "Can I update my delivery address after booking?"
+    context: "No policy source is available."
+    checks: [does_not_invent_policy, asks_one_focused_question_or_points_to_verified_source]
